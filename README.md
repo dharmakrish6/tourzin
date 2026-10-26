@@ -1,7 +1,7 @@
 # Tourzin — MVP Web App
 
 Tamil Nadu tourist-vehicle marketplace, built from **Tourzin MVP Master Product & Developer Specification v1.0**.
-Next.js 16 (App Router) + TypeScript + Tailwind CSS v4, exported as a **static site** (`out/`) for Hostinger / cPanel.
+Next.js 16 (App Router) + TypeScript + Tailwind CSS v4, exported as a **static site** (`public_html/`) for Hostinger / cPanel.
 
 Runs today on **dummy data** (stored in the browser). Swapping to **Firebase** later is a config change — no page changes.
 
@@ -12,8 +12,8 @@ Runs today on **dummy data** (stored in the browser). Swapping to **Firebase** l
 ```bash
 npm install
 npm run dev          # http://localhost:3000
-npm run build        # static export → out/
-npm start            # preview out/ locally
+npm run build        # static export → public_html/
+npm start            # preview public_html/ locally
 ```
 
 ### Demo logins (mock mode)
@@ -97,7 +97,7 @@ Run it on your own computer to include edits made in the old admin (this build o
 Before launch: move `internalNotes` and other private operator fields to a staff-only sub-collection (public reads currently include them — noted in the rules file).
 
 ## Deploying to Hostinger
-`npm run build`, then upload the **contents** of `out/` to `public_html/`. `.htaccess` is included for trailing-slash URLs and the 404 page.
+`npm run build`, then upload the **contents** of the local `public_html/` folder to the server's `public_html/`. `.htaccess` is included for trailing-slash URLs and the 404 page.
 
 ## Notes
 - Operators/vehicles come from the old site's catalog (see above); enquiries, payments and analytics are demo data.
