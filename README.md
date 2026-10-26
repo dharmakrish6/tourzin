@@ -72,6 +72,18 @@ scripts/gen-placeholder-images.mjs
 
 ---
 
+## Migrating the old site's buses
+
+`npm run migrate:buses` converts the old Tourzin site's listings (repo `tourbus`) into the new model:
+
+- **Sources:** `scripts/legacy/buses.json` (old base catalog, recovered from git history) **+ live Firestore `buses`** in `tourzin-b6323` (public read) — merged exactly like the old site (edits override, `deleted: true` skipped).
+- **Output:** `src/lib/data/migrated.json` → used automatically as the operators/vehicles in mock mode.
+- **Mapping:** one operator per name + district; each bus → a vehicle. Type: `TT` → Tempo Traveller, `Urbania` → Urbania, `Coach*` → Tourist Coach, `Mini Bus` → Mini Bus (hidden until launch), other bus types by seats (≤17 TT, ≤26 Mini Bus, ≤35 Coach, else Tourist Bus). `paid` → Premium + Active, otherwise Base + Trial. `verified` kept. `perDayRent` → approx. daily price (lowest per operator). `available:false` → vehicle Paused. Email, location, amenities and old rating go to internal notes (ratings are not shown publicly).
+- **Photos:** the old site had none, so each vehicle gets placeholder illustrations (flagged in internal notes) — replace in Admin → Vehicles.
+- **Write to Firestore:** `npm i -D firebase-admin` then `node scripts/migrate-buses.mjs --write --service-account ./serviceAccount.json`. Writes `operators` + `vehicles` only; the old `buses`/`analytics` collections are untouched. Keep the key file out of git.
+
+Run it on your own computer to include edits made in the old admin (this build only had the git-history catalog).
+
 ## Moving to Firebase
 
 1. `npm install firebase`
@@ -88,6 +100,6 @@ Before launch: move `internalNotes` and other private operator fields to a staff
 `npm run build`, then upload the **contents** of `out/` to `public_html/`. `.htaccess` is included for trailing-slash URLs and the 404 page.
 
 ## Notes
-- All operator names, numbers and prices are fictional demo data.
+- Operators/vehicles come from the old site's catalog (see above); enquiries, payments and analytics are demo data.
 - Plan pricing is intentionally not hard-coded (configurable in Admin).
 - Legal page copy is placeholder text pending legal review.

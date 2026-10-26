@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "npx serve out",
-    "lint": "next lint"
+    "lint": "next lint",
+    "migrate:buses": "node scripts/migrate-buses.mjs"
   },
   "dependencies": {
     "next": "16.4.3",

@@ -1,7 +1,7 @@
-// DUMMY DATA — used while NEXT_PUBLIC_DATA_SOURCE=mock.
-// All operator names, phone numbers and prices here are fictional placeholders.
-// When switching to Firebase, import this same shape into Firestore (see README),
-// or start with empty collections.
+// SEED DATA — used while NEXT_PUBLIC_DATA_SOURCE=mock.
+// Operators + vehicles come from ./migrated.json (the old Tourzin site's buses, converted by
+// scripts/migrate-buses.mjs). If that file is empty, fictional demo operators are used instead.
+// Enquiries, payments and analytics below are demo data built on top of whichever set is active.
 
 import type {
   Enquiry,
@@ -18,6 +18,7 @@ import type {
   SubscriptionStatus,
   OperatorStatus,
 } from "../types";
+import migrated from "./migrated.json";
 
 const today = new Date();
 const iso = (d: Date) => d.toISOString().slice(0, 10);
@@ -79,7 +80,7 @@ const OPS: OpSeed[] = [
 const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
 let phoneSeed = 70100;
-export const seedOperators: Operator[] = OPS.map((o, i) => {
+const demoOperators: Operator[] = OPS.map((o, i) => {
   const [name, contact, district, serves, plan, verified, price, sub, exp, status, fleet] = o;
   const total = fleet.reduce((s, f) => s + f[2], 0);
   const mob = `9${(phoneSeed + i * 137).toString().padStart(5, "0")}${(10000 + i * 731).toString().slice(-4)}`;
@@ -114,16 +115,16 @@ const MODELS: Record<VehicleTypeId, string[]> = {
   "tourist-bus": ["Ashok Leyland Viking", "BharatBenz 1624", "Volvo 9600 (Semi-sleeper)"],
 };
 
-export const seedVehicles: Vehicle[] = [];
+const demoVehicles: Vehicle[] = [];
 OPS.forEach((o, i) => {
-  const op = seedOperators[i];
+  const op = demoOperators[i];
   let n = 0;
   o[10].forEach(([type, seats, count, ac], fi) => {
     for (let c = 0; c < count; c++) {
       n++;
       const pal = ((i + fi + c) % 4) + 1;
       const alt = ((i + fi + c + 2) % 4) + 1;
-      seedVehicles.push({
+      demoVehicles.push({
         id: `${op.id}-v${n}`,
         operatorId: op.id,
         type,
@@ -145,20 +146,26 @@ OPS.forEach((o, i) => {
   });
 });
 
-// Featured: must be Premium + Verified + Active + manually selected (max 4)
-const FEATURED = [
-  "op-sri-murugan-tours-travels",
-  "op-kovai-kings-travels",
-  "op-meenakshi-travels",
-  "op-rockfort-travels",
-];
+export const USING_MIGRATED_DATA = (migrated.operators?.length ?? 0) > 0;
+export const seedOperators: Operator[] = USING_MIGRATED_DATA ? (migrated.operators as Operator[]) : demoOperators;
+export const seedVehicles: Vehicle[] = USING_MIGRATED_DATA ? (migrated.vehicles as Vehicle[]) : demoVehicles;
+
+// Featured: must be Premium + Verified + Active + manually selected (max 4).
+// Initial pick = first eligible operators in popular districts; Admin can change it.
+const POPULAR = ["chennai", "coimbatore", "madurai", "salem", "tiruchirappalli", "dharmapuri", "thanjavur", "kanniyakumari"];
+const FEATURED = seedOperators
+  .filter((o) => o.plan === "premium" && o.verified && o.status === "active" && ["active", "expiring-soon"].includes(o.subscriptionStatus))
+  .filter((o) => seedVehicles.some((v) => v.operatorId === o.id && v.status === "active" && v.type !== "mini-bus"))
+  .sort((a, b) => (POPULAR.indexOf(a.primaryDistrict) + 1 || 99) - (POPULAR.indexOf(b.primaryDistrict) + 1 || 99))
+  .slice(0, 4)
+  .map((o) => o.id);
 seedOperators.forEach((op) => {
-  if (FEATURED.includes(op.id)) op.featured = true;
+  op.featured = FEATURED.includes(op.id);
 });
 
 export const seedSiteConfig: SiteConfig = {
   featuredOperatorIds: FEATURED,
-  popularDistrictIds: ["chennai", "coimbatore", "madurai", "salem", "tiruchirappalli", "dharmapuri", "thanjavur", "kanniyakumari"],
+  popularDistrictIds: POPULAR,
   supportPhone: "+91 90000 00000",
   supportWhatsapp: "919000000000",
   supportEmail: "support@tourzin.com",
@@ -187,7 +194,7 @@ const at = (days: number, h = 10) => {
   return d.toISOString();
 };
 
-export const seedEnquiries: Enquiry[] = [
+const demoEnquiries: Enquiry[] = [
   {
     id: "ENQ-1042", createdAt: at(0, 9), source: "web-form", sourceNote: "",
     district: "chennai", destination: "Pondicherry", travelDate: addDays(9), returnDate: addDays(10),
@@ -263,6 +270,34 @@ export const seedEnquiries: Enquiry[] = [
     activity: [{ at: at(-9, 13), by: "System", text: "Enquiry submitted" }],
   },
 ];
+
+// Point demo enquiry matches at operators that exist in the active seed set
+// (same district if possible), so they work with migrated data too.
+const opExists = (id: string) => seedOperators.some((o) => o.id === id);
+const demoOpDistrict = (id: string) => demoOperators.find((o) => o.id === id)?.primaryDistrict;
+const remapOp = (id: string, taken: string[]) => {
+  if (!id || opExists(id)) return id;
+  const d = demoOpDistrict(id);
+  return seedOperators.find((o) => o.primaryDistrict === d && !taken.includes(o.id))?.id ?? "";
+};
+export const seedEnquiries: Enquiry[] = demoEnquiries.map((e) => {
+  const taken: string[] = [];
+  const matches = e.matches
+    .map((m) => {
+      const id = remapOp(m.operatorId, taken);
+      if (id) taken.push(id);
+      return { ...m, operatorId: id };
+    })
+    .filter((m) => m.operatorId);
+  const sel = e.selectedOperatorId ? remapOp(e.selectedOperatorId, []) : "";
+  const name = (id: string) => seedOperators.find((o) => o.id === id)?.name ?? "";
+  return {
+    ...e,
+    matches,
+    selectedOperatorId: matches.some((m) => m.operatorId === sel) ? sel : "",
+    customerResponse: e.selectedOperatorId && matches.some((m) => m.operatorId === sel) ? `Chose ${name(sel)}` : e.customerResponse,
+  };
+});
 
 export const seedPayments: Payment[] = seedOperators
   .filter((o) => ["active", "expiring-soon", "expired"].includes(o.subscriptionStatus))
@@ -386,8 +421,8 @@ export const seedEvents: AnalyticsEvent[] = (() => {
 })();
 
 // A few renewals this month so the revenue / renewal KPIs show demo values.
-["op-kovai-kings-travels", "op-yercaud-travels", "op-vellore-fort-travels"].forEach((oid, i) => {
-  const o = seedOperators.find((x) => x.id === oid)!;
+seedOperators.filter((o) => o.subscriptionStatus === "active").slice(0, 3).forEach((o, i) => {
+  const oid = o.id;
   seedPayments.push({
     id: `pay-${oid}-renew`, operatorId: oid, amount: o.plan === "premium" ? 6000 : 2500, date: addDays(-i * 3),
     mode: "upi", reference: `UPI${880100 + i}`, periodStart: o.subscriptionStart, periodEnd: o.subscriptionExpiry, plan: o.plan, renewal: true,

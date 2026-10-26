@@ -17,7 +17,7 @@ import {
   seedEvents,
 } from "./seed";
 
-const KEY = "tourzin:mockdb:v1";
+const KEY = "tourzin:mockdb:v2"; // bump when seed data shape/content changes
 const SESSION_KEY = "tourzin:session";
 
 type DB = {
