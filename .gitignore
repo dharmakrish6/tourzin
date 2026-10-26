@@ -66,8 +66,9 @@ web_modules/
 .yarn-integrity
 
 # dotenv environment variable files
-.env
+# .env is committed (public Firebase web config only)
 .env.*
+!.env.example
 !.env.example
 
 # parcel-bundler cache (https://parceljs.org/)
