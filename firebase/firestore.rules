@@ -1,0 +1,28 @@
+rules_version = '2';
+// Tourzin Firestore rules — public read of marketplace data, public create of
+// enquiries / leads / contact messages / events, staff-only everything else.
+service cloud.firestore {
+  match /databases/{db}/documents {
+    function staff() { return request.auth != null && exists(/databases/$(db)/documents/staff/$(request.auth.uid)) && get(/databases/$(db)/documents/staff/$(request.auth.uid)).data.active == true; }
+    function role() { return get(/databases/$(db)/documents/staff/$(request.auth.uid)).data.role; }
+    function admin() { return staff() && role() == "admin"; }
+
+    // Public marketplace data. NOTE: internalNotes live on these docs in the MVP;
+    // before launch, move private fields to operators/{id}/private/meta.
+    match /operators/{id} { allow read: if true; allow write: if admin(); }
+    match /vehicles/{id}  { allow read: if true; allow write: if admin(); }
+    match /districts/{id} { allow read: if true; allow write: if admin(); }
+    match /config/site    { allow read: if true; allow write: if admin(); }
+    match /config/counters { allow read, write: if true; } // enquiry ID counter (tighten with a Cloud Function later)
+
+    // Customer / operator submissions: anyone may create, only staff read.
+    match /enquiries/{id}       { allow create: if true; allow read, update: if staff(); allow delete: if admin(); }
+    match /operatorLeads/{id}   { allow create: if true; allow read, update, delete: if admin(); }
+    match /contactMessages/{id} { allow create: if true; allow read, delete: if admin(); }
+    match /events/{id}          { allow create: if true; allow read: if admin(); }
+
+    // Admin-only commercial + user management
+    match /payments/{id} { allow read, write: if admin(); }
+    match /staff/{uid}   { allow read: if request.auth != null && (request.auth.uid == uid || admin()); allow write: if admin(); }
+  }
+}

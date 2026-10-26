@@ -1,0 +1,13 @@
+# Hostinger / cPanel (Apache) — serve Next.js static export with trailing-slash URLs
+Options -MultiViews
+DirectoryIndex index.html
+ErrorDocument 404 /404.html
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 month"
+</IfModule>
+<FilesMatch "^(admin|executive)">
+  Header set X-Robots-Tag "noindex, nofollow"
+</FilesMatch>

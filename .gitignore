@@ -147,3 +147,10 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# Tourzin
+.next
+out
+next-env.d.ts
+*.tsbuildinfo
+.env*.local
