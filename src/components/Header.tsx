@@ -102,6 +102,9 @@ export function Header() {
           <Link href="/for-operators/#join" className="btn btn-secondary btn-sm hidden xl:inline-flex">
             List Your Vehicle
           </Link>
+          <Link href="/let-tourzin-help/" className="btn btn-blue btn-sm hidden whitespace-nowrap sm:inline-flex lg:hidden xl:inline-flex">
+            Quick Booking
+          </Link>
           <Link href="/search/" className="btn btn-primary btn-sm">
             Search Vehicles
           </Link>
@@ -120,6 +123,9 @@ export function Header() {
       {menu && (
         <div className="fixed inset-x-0 bottom-0 top-16 z-40 overflow-y-auto bg-white lg:hidden">
           <nav aria-label="Mobile" className="container-x space-y-6 py-6">
+            <Link href="/let-tourzin-help/" className="btn btn-blue w-full">
+              Quick Booking
+            </Link>
             <div>
               <p className="eyebrow mb-2">Vehicles</p>
               <ul className="grid grid-cols-1 gap-1 sm:grid-cols-2">
