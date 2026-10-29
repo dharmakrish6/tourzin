@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHero } from "@/components/ui";
-import { GUIDES } from "@/lib/data/seed";
+import { GUIDES } from "@/lib/data/content";
 
 export const metadata: Metadata = {
   title: "Travel Guides — Tourist Vehicles in Tamil Nadu",

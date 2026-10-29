@@ -30,13 +30,14 @@ function validateImage(file: File): Promise<{ ok: true; url: string } | { ok: fa
       img.onload = () => {
         if (img.naturalWidth < MIN_W || img.naturalHeight < MIN_H)
           return resolve({ ok: false, reason: `${file.name}: ${img.naturalWidth}×${img.naturalHeight}px is below the ${MIN_W}×${MIN_H}px minimum` });
-        // Downscale for demo storage (mock mode keeps images in localStorage)
-        const scale = Math.min(1, 1200 / img.naturalWidth);
+        // Uploaded photos are stored inline on the vehicle doc (no Firebase Storage yet), and a
+        // Firestore doc is capped at 1 MB — so downscale hard: ~60–120 KB per photo.
+        const scale = Math.min(1, 960 / img.naturalWidth);
         const c = document.createElement("canvas");
         c.width = Math.round(img.naturalWidth * scale);
         c.height = Math.round(img.naturalHeight * scale);
         c.getContext("2d")!.drawImage(img, 0, 0, c.width, c.height);
-        resolve({ ok: true, url: c.toDataURL("image/webp", 0.8) });
+        resolve({ ok: true, url: c.toDataURL("image/webp", 0.7) });
       };
       img.src = url;
     };
@@ -95,6 +96,7 @@ export function VehicleEditor() {
     if (!v.operatorId) base.push("Choose the operator");
     if (!v.model.trim()) base.push("Model / name is required");
     if (v.status === "active") activationProblems(v).forEach((p) => base.push(`Cannot activate — missing: ${p}`));
+    if (new Blob([JSON.stringify(v)]).size > 950_000) base.push("Photos are too large to save together — remove one, or use image links instead of uploads");
     setErrs([...new Set(base)]);
     if (base.length) return;
     const final = { ...v, id: v.id || `${v.operatorId}-v${Date.now().toString(36).slice(-5)}` };

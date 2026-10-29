@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { DISTRICTS, VEHICLE_CATEGORIES } from "@/lib/constants";
-import { seedSiteConfig } from "@/lib/data/seed";
+import { DEFAULT_SITE_CONFIG } from "@/lib/data/content";
 import { Logo } from "./Logo";
 
 const cols: { title: string; links: { href: string; label: string }[] }[] = [
@@ -60,9 +60,9 @@ export function Footer() {
             Tamil Nadu&apos;s marketplace for tourist vehicles. Discover, compare and contact operators directly.
           </p>
           <p className="text-sm text-white/70">
-            {seedSiteConfig.supportPhone}
+            {DEFAULT_SITE_CONFIG.supportPhone}
             <br />
-            {seedSiteConfig.supportEmail}
+            {DEFAULT_SITE_CONFIG.supportEmail}
           </p>
         </div>
         <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:grid-cols-6">

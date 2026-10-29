@@ -44,7 +44,7 @@ if (existsSync(resolve(ROOT, ".env")))
 const PROJECT = opt("project", env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "tourzin-b6323");
 const API_KEY = opt("api-key", env.NEXT_PUBLIC_FIREBASE_API_KEY || "");
 const LEGACY = opt("legacy") ? resolve(ROOT, opt("legacy")) : null;
-const OUT = resolve(ROOT, opt("out", "src/lib/data/migrated.json"));
+const OUT = resolve(ROOT, opt("out", "scripts/output/migrated.json"));
 
 // ── District ids from the new app (src/lib/constants.ts) ────────────────────
 const slug = (s) => String(s || "").toLowerCase().replace(/\(.*?\)/g, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");

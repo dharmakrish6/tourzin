@@ -1,6 +1,6 @@
 "use client";
-// Analytics — consistent event names (spec §14). Logged to the repository (mock: localStorage,
-// Firebase: events collection) and mirrored to GA4 via gtag when NEXT_PUBLIC_GA_MEASUREMENT_ID is set.
+// Analytics — consistent event names (spec §14). Logged to the Firestore events collection
+// and mirrored to GA4 via gtag when NEXT_PUBLIC_GA_MEASUREMENT_ID is set.
 
 import { db } from "./data";
 

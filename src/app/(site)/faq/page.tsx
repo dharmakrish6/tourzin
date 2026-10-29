@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { FaqList } from "@/components/FaqList";
 import { PageHero } from "@/components/ui";
-import { FAQS } from "@/lib/data/seed";
+import { FAQS } from "@/lib/data/content";
 
 export const metadata: Metadata = {
   title: "Frequently Asked Questions",

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/ui";
-import { GUIDES } from "@/lib/data/seed";
+import { GUIDES } from "@/lib/data/content";
 
 export const dynamicParams = false;
 export const generateStaticParams = () => GUIDES.map((g) => ({ slug: g.slug }));

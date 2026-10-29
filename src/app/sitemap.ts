@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { DISTRICTS, SITE, VEHICLE_CATEGORIES } from "@/lib/constants";
-import { GUIDES } from "@/lib/data/seed";
+import { GUIDES } from "@/lib/data/content";
 
 export const dynamic = "force-static";
 

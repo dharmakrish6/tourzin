@@ -16,7 +16,7 @@ import {
 import { SearchForm } from "@/components/SearchForm";
 import { SectionHead } from "@/components/ui";
 import { VEHICLE_CATEGORIES } from "@/lib/constants";
-import { FAQS, GUIDES, seedSiteConfig } from "@/lib/data/seed";
+import { FAQS, GUIDES, DEFAULT_SITE_CONFIG } from "@/lib/data/content";
 
 export const metadata: Metadata = {
   title: { absolute: "Tourzin — Find Tourist Vehicles in Tamil Nadu | Tempo Traveller, Urbania, Bus" },
@@ -165,8 +165,8 @@ export default function HomePage() {
           <div className="card flex flex-col p-6">
             <span className="grid h-11 w-11 place-items-center rounded-xl bg-blue-50 text-blue"><IconPhone /></span>
             <h3 className="h3 mt-4">Prefer to speak to us?</h3>
-            <p className="mt-1 flex-1 text-sm text-muted">{seedSiteConfig.businessHours}</p>
-            <a href={`tel:${seedSiteConfig.supportPhone.replace(/\s/g, "")}`} className="btn btn-secondary mt-5">Call Tourzin</a>
+            <p className="mt-1 flex-1 text-sm text-muted">{DEFAULT_SITE_CONFIG.businessHours}</p>
+            <a href={`tel:${DEFAULT_SITE_CONFIG.supportPhone.replace(/\s/g, "")}`} className="btn btn-secondary mt-5">Call Tourzin</a>
           </div>
         </div>
       </section>

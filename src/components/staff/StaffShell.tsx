@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useState, type ComponentType, type ReactNode } from "react";
-import { db, DATA_SOURCE } from "@/lib/data";
+import { db } from "@/lib/data";
 import type { Role, StaffUser } from "@/lib/types";
 import { IconLogout, IconMenu, IconX } from "../Icons";
 import { Logo } from "../Logo";
@@ -115,11 +115,6 @@ export function StaffShell({
             <button onClick={() => setOpen(true)} aria-label="Open menu" className="text-navy"><IconMenu /></button>
             <span className="font-semibold text-navy">{area}</span>
           </header>
-          {DATA_SOURCE === "mock" && (
-            <div className="border-b border-orange/30 bg-orange-50 px-4 py-1.5 text-center text-xs text-ink lg:px-8">
-              Demo mode — dummy data stored in this browser. <button className="font-semibold text-blue underline" onClick={async () => { if (confirm("Reset all demo data to the original seed?")) { await db.resetDemoData(); location.reload(); } }}>Reset demo data</button>
-            </div>
-          )}
           <main id="main" className="px-4 py-6 lg:px-8">{children}</main>
         </div>
       </div>

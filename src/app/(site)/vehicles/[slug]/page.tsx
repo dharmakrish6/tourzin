@@ -6,7 +6,7 @@ import { IconCheckCircle, IconSearch, IconUsers } from "@/components/Icons";
 import { TrackedLink } from "@/components/TrackedLink";
 import { Breadcrumbs } from "@/components/ui";
 import { DISTRICTS, VEHICLE_CATEGORIES, categoryById } from "@/lib/constants";
-import { GUIDES } from "@/lib/data/seed";
+import { GUIDES } from "@/lib/data/content";
 import type { FaqItem } from "@/lib/types";
 
 export const dynamicParams = false;

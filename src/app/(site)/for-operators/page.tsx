@@ -3,7 +3,7 @@ import { FaqList } from "@/components/FaqList";
 import { JoinForm } from "@/components/forms/JoinForm";
 import { IconChart, IconCheckCircle, IconPhone, IconShield, IconStar, IconUsers } from "@/components/Icons";
 import { SectionHead } from "@/components/ui";
-import { FAQS } from "@/lib/data/seed";
+import { FAQS } from "@/lib/data/content";
 
 export const metadata: Metadata = {
   title: "List Your Tourist Vehicles — Join Tourzin",

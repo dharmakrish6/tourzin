@@ -1,11 +1,13 @@
 rules_version = '2';
 // Tourzin Firestore rules — public read of marketplace data, public create of
 // enquiries / leads / contact messages / events, staff-only everything else.
+// The old site (buses / analytics) shares this project; its rules are kept as-is below.
 service cloud.firestore {
   match /databases/{db}/documents {
-    function staff() { return request.auth != null && exists(/databases/$(db)/documents/staff/$(request.auth.uid)) && get(/databases/$(db)/documents/staff/$(request.auth.uid)).data.active == true; }
-    function role() { return get(/databases/$(db)/documents/staff/$(request.auth.uid)).data.role; }
-    function admin() { return staff() && role() == "admin"; }
+    // Staff docs are keyed by lower-case email (staff sign in with Google).
+    function staffPath() { return /databases/$(db)/documents/staff/$(request.auth.token.email.lower()); }
+    function staff() { return request.auth != null && request.auth.token.email_verified == true && exists(staffPath()) && get(staffPath()).data.active == true; }
+    function admin() { return staff() && get(staffPath()).data.role == "admin"; }
 
     // Public marketplace data. NOTE: internalNotes live on these docs in the MVP;
     // before launch, move private fields to operators/{id}/private/meta.
@@ -23,6 +25,26 @@ service cloud.firestore {
 
     // Admin-only commercial + user management
     match /payments/{id} { allow read, write: if admin(); }
-    match /staff/{uid}   { allow read: if request.auth != null && (request.auth.uid == uid || admin()); allow write: if admin(); }
+    match /staff/{email} { allow read: if request.auth != null && (request.auth.token.email.lower() == email || admin()); allow write: if admin(); }
+
+    // ── Old site (tourbus) — unchanged ──────────────────────────────────────
+    function oldSiteAdmin() {
+      return request.auth != null &&
+        request.auth.token.email_verified == true &&
+        request.auth.token.email in [
+          'dharmakrish6@gmail.com',
+          'kgmtravelagency@gmail.com',
+          'kgmmani24@gmail.com'
+        ];
+    }
+    match /buses/{document=**} {
+      allow read: if true;
+      allow write: if oldSiteAdmin();
+    }
+    match /analytics/{document=**} {
+      allow read: if oldSiteAdmin();
+      allow create, update: if request.auth != null;
+      allow delete: if oldSiteAdmin();
+    }
   }
 }

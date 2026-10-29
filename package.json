@@ -10,6 +10,7 @@
     "migrate:buses": "node scripts/migrate-buses.mjs"
   },
   "dependencies": {
+    "firebase": "^11.10.0",
     "next": "16.4.3",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"

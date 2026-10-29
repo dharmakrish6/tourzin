@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Pill } from "@/components/staff/kit";
 import { PageTitle } from "@/components/staff/StaffShell";
 import { DISTRICTS, VEHICLE_CATEGORIES } from "@/lib/constants";
-import { FAQS, GUIDES } from "@/lib/data/seed";
+import { FAQS, GUIDES } from "@/lib/data/content";
 
 const rows: [string, string, "Index" | "Noindex" | "Private", string][] = [
   ["/", "Home", "Index", "Core"],
@@ -47,7 +47,7 @@ export default function ContentPage() {
           </tbody>
         </table>
       </div>
-      <p className="mt-3 text-xs text-muted">In this MVP build, FAQ, guide and district copy live in <code>src/lib/data/seed.ts</code> and <code>src/lib/constants.ts</code>. Each indexable page sets a unique title, meta description and self-referencing canonical; filter URLs are noindex.</p>
+      <p className="mt-3 text-xs text-muted">In this MVP build, FAQ, guide and district copy live in <code>src/lib/data/content.ts</code> and <code>src/lib/constants.ts</code>. Each indexable page sets a unique title, meta description and self-referencing canonical; filter URLs are noindex.</p>
     </>
   );
 }

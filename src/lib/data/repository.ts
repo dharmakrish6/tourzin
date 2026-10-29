@@ -1,8 +1,5 @@
-// The single data-access contract the UI talks to.
-// Two implementations:
-//   - mock.ts      → dummy seed data persisted in the browser (localStorage). Default.
-//   - firebase.ts  → Firestore + Firebase Auth. Fill in when moving to Firebase.
-// Pages and components never import mock.ts / firebase.ts directly — only `db` from ./index.
+// The single data-access contract the UI talks to, implemented by firebase.ts (Firestore + Firebase Auth).
+// Pages and components never import firebase.ts directly — only `db` from ./index.
 
 import type {
   AnalyticsEvent,
@@ -56,15 +53,12 @@ export interface Repository {
   listStaff(): Promise<StaffUser[]>;
   saveStaff(u: StaffUser): Promise<void>;
 
-  // Auth (Admin / Executive only — no customer or operator login in MVP)
-  signIn(email: string, password: string): Promise<StaffUser>;
+  // Auth (Admin / Executive only — no customer or operator login in MVP). Google sign-in.
+  signIn(): Promise<StaffUser>;
   signOut(): Promise<void>;
   currentUser(): Promise<StaffUser | null>;
 
   // Analytics (mirrored to GA4 when configured)
   logEvent(e: AnalyticsEvent): Promise<void>;
   listEvents(): Promise<AnalyticsEvent[]>;
-
-  // Demo helper
-  resetDemoData(): Promise<void>;
 }

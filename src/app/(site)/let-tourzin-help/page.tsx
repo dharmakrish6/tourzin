@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { HelpForm } from "@/components/forms/HelpForm";
 import { IconCheckCircle, IconPhone } from "@/components/Icons";
 import { PageHero } from "@/components/ui";
-import { seedSiteConfig } from "@/lib/data/seed";
+import { DEFAULT_SITE_CONFIG } from "@/lib/data/content";
 
 export const metadata: Metadata = {
   title: "Let Tourzin Help Find the Right Vehicle",
@@ -37,8 +37,8 @@ export default function HelpPage() {
           </div>
           <div className="card p-6">
             <h2 className="h3">Prefer to speak?</h2>
-            <p className="mt-1 text-sm text-muted">{seedSiteConfig.businessHours}</p>
-            <a href={`tel:${seedSiteConfig.supportPhone.replace(/\s/g, "")}`} className="btn btn-secondary mt-4 w-full">
+            <p className="mt-1 text-sm text-muted">{DEFAULT_SITE_CONFIG.businessHours}</p>
+            <a href={`tel:${DEFAULT_SITE_CONFIG.supportPhone.replace(/\s/g, "")}`} className="btn btn-secondary mt-4 w-full">
               <IconPhone size={18} /> Call Tourzin
             </a>
           </div>

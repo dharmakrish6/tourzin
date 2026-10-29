@@ -5,7 +5,7 @@ import { useState } from "react";
 import { track } from "@/lib/analytics";
 import { districtById } from "@/lib/constants";
 import { db } from "@/lib/data";
-import { seedSiteConfig } from "@/lib/data/seed";
+import { DEFAULT_SITE_CONFIG } from "@/lib/data/content";
 import { useAsync } from "@/lib/hooks";
 import { isFeaturedEligible, whatsappMessage } from "@/lib/search";
 import { IconArrowRight, IconPin } from "../Icons";
@@ -17,7 +17,7 @@ export function PopularDistricts() {
     const [cfg, districts] = await Promise.all([db.getSiteConfig(), db.listDistricts()]);
     return { cfg, districts };
   });
-  const ids = data?.cfg.popularDistrictIds ?? seedSiteConfig.popularDistrictIds;
+  const ids = data?.cfg.popularDistrictIds ?? DEFAULT_SITE_CONFIG.popularDistrictIds;
   const list = ids
     .map((id) => data?.districts.find((d) => d.id === id) ?? districtById(id))
     .filter(Boolean) as NonNullable<ReturnType<typeof districtById>>[];

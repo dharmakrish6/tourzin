@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ContactForm } from "@/components/forms/ContactForm";
 import { IconClock, IconMail, IconPhone, IconWhatsApp } from "@/components/Icons";
 import { PageHero } from "@/components/ui";
-import { seedSiteConfig as cfg } from "@/lib/data/seed";
+import { DEFAULT_SITE_CONFIG as cfg } from "@/lib/data/content";
 
 export const metadata: Metadata = {
   title: "Contact Tourzin",
