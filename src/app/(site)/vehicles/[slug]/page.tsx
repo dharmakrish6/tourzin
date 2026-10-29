@@ -60,7 +60,7 @@ export default async function VehiclePage({ params }: { params: Promise<{ slug: 
               </div>
             )}
           </div>
-          <img src={`/img/vehicles/${c.id}-2.svg`} alt={`${c.name} illustration`} className="w-full rounded-2xl border border-line" />
+          <img src={c.photo ?? `/img/vehicles/${c.id}-2.svg`} alt={c.photo ? c.name : `${c.name} illustration`} className="w-full rounded-2xl border border-line" />
         </div>
       </section>
 

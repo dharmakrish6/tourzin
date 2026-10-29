@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: { default: "Tourzin — Tourist Vehicle Marketplace in Tamil Nadu", template: "%s | Tourzin" },
   description:
     "Find and compare Tempo Travellers, Urbanias, tourist coaches and tourist buses across Tamil Nadu. Contact operators directly by call or WhatsApp.",
-  icons: { icon: "/favicon.svg" },
+  icons: { icon: "/favicon.png", apple: "/apple-touch-icon.png" },
   openGraph: { siteName: "Tourzin", type: "website", locale: "en_IN" },
 };
 

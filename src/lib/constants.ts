@@ -37,6 +37,7 @@ export const VEHICLE_CATEGORIES: VehicleCategory[] = [
     maxSeats: 17,
     live: true,
     color: "#0B2744",
+    photo: "/img/categories/urbania.jpg",
     blurb:
       "A premium van with a modern cabin, more headroom and a smoother ride. Popular for corporate travel and comfort-focused family trips.",
     useCases: ["Corporate & client travel", "Premium family holidays", "Airport group transfers", "Long-distance comfort trips"],

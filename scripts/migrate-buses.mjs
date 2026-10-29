@@ -3,16 +3,17 @@
 // Migrate the OLD Tourzin site's bus listings into the NEW data model.
 //
 //   Old model (tourbus repo):  one "bus" = operator + one vehicle
-//     sources: buses.json base catalog  +  Firestore `buses` overrides/additions
-//              (same merge as the old site: matching id overrides, deleted:true hides)
+//     source:  Firestore `buses` (deleted:true hides). Optionally a legacy
+//              buses.json base catalog merged underneath (--legacy <file>),
+//              same merge as the old site: matching id overrides.
 //   New model (this app):      operators[]  +  vehicles[]   (src/lib/types.ts)
 //
 // Usage
 //   node scripts/migrate-buses.mjs
-//       → reads scripts/legacy/buses.json + LIVE Firestore `buses` (public read),
+//       → reads LIVE Firestore `buses` only (public read),
 //         writes src/lib/data/migrated.json and prints a report.
-//   node scripts/migrate-buses.mjs --offline
-//       → legacy file only (no network).
+//   node scripts/migrate-buses.mjs --legacy scripts/legacy/buses.json [--offline]
+//       → also merge the old git-history catalog underneath (--offline: file only).
 //   node scripts/migrate-buses.mjs --write --service-account ./serviceAccount.json
 //       → also writes operators/vehicles into Firestore (needs `npm i -D firebase-admin`).
 //         Existing `buses` / `analytics` collections are NOT touched.
@@ -42,7 +43,7 @@ if (existsSync(resolve(ROOT, ".env")))
 
 const PROJECT = opt("project", env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "tourzin-b6323");
 const API_KEY = opt("api-key", env.NEXT_PUBLIC_FIREBASE_API_KEY || "");
-const LEGACY = resolve(ROOT, opt("legacy", "scripts/legacy/buses.json"));
+const LEGACY = opt("legacy") ? resolve(ROOT, opt("legacy")) : null;
 const OUT = resolve(ROOT, opt("out", "src/lib/data/migrated.json"));
 
 // ── District ids from the new app (src/lib/constants.ts) ────────────────────
@@ -58,6 +59,8 @@ const DISTRICT_ALIASES = {
   trichy: "tiruchirappalli", tiruchi: "tiruchirappalli",
   thoothukkudi: "thoothukudi", tuticorin: "thoothukudi",
   tiruvallur: "tiruvallur", thiruvallur: "tiruvallur",
+  pudukottai: "pudukkottai", pudukotai: "pudukkottai",
+  hosur: "krishnagiri",
 };
 function districtId(name, fallbackId) {
   for (const c of [name, fallbackId]) {
@@ -121,11 +124,13 @@ async function fetchLiveBuses() {
     const j = await res.json();
     for (const d of j.documents || []) {
       const id = d.name.split("/").pop();
-      out.push({ id, ...Object.fromEntries(Object.entries(d.fields || {}).map(([k, v]) => [k, fromFsValue(v)])) });
+      out.push({ id, ...Object.fromEntries(Object.entries(d.fields || {}).map(([k, v]) => [k, fromFsValue(v)])), _updated: d.updateTime });
     }
     pageToken = j.nextPageToken || "";
   } while (pageToken);
-  return out;
+  // Docs are keyed by their `id` field, and some buses have an older copy under an
+  // auto-id doc — oldest first so the latest edit wins the merge.
+  return out.sort((a, b) => String(a._updated).localeCompare(String(b._updated)));
 }
 
 // ── Merge exactly like the old site (js/data.js buildMergedBusMap) ──────────
@@ -139,6 +144,7 @@ function mergeBuses(baseDistricts, overrides) {
   for (const doc of overrides || []) {
     if (!doc?.id) continue;
     const prior = map.get(doc.id);
+    if (prior?._source === "firestore") report.warnings.push(`Firestore has more than one doc for bus ${doc.id} ("${prior.operator}") — kept the most recently updated.`);
     map.set(doc.id, {
       ...(prior || {}),
       ...doc,
@@ -154,9 +160,10 @@ function mergeBuses(baseDistricts, overrides) {
 // ── Main ─────────────────────────────────────────────────────────────────────
 const report = { generatedAt: new Date().toISOString(), sources: [], skipped: [], warnings: [], typeMapping: {} };
 
-const legacy = existsSync(LEGACY) ? JSON.parse(readFileSync(LEGACY, "utf8")) : { districts: [] };
+const legacy = LEGACY ? JSON.parse(readFileSync(LEGACY, "utf8")) : { districts: [] };
 const baseDistricts = legacy.districts || [];
-report.sources.push(`${LEGACY.replace(ROOT + "/", "")}: ${baseDistricts.reduce((s, d) => s + (d.buses?.length || 0), 0)} buses`);
+if (LEGACY) report.sources.push(`${LEGACY.replace(ROOT + "/", "")}: ${baseDistricts.reduce((s, d) => s + (d.buses?.length || 0), 0)} buses`);
+if (flag("offline") && !LEGACY) { console.error("--offline needs --legacy <file> (Firestore is the only other source)."); process.exit(1); }
 
 let live = [];
 if (!flag("offline")) {
@@ -164,7 +171,8 @@ if (!flag("offline")) {
     live = await fetchLiveBuses();
     report.sources.push(`Firestore ${PROJECT}/buses: ${live.length} docs`);
   } catch (e) {
-    report.warnings.push(`Could not read live Firestore buses (${e.message}). Using legacy file only — re-run where Firestore is reachable to include admin edits made on the old site.`);
+    console.error(`Could not read live Firestore buses: ${e.message}`);
+    process.exit(1);
   }
 } else report.sources.push("Firestore: skipped (--offline)");
 

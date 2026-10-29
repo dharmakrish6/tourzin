@@ -76,13 +76,11 @@ scripts/gen-placeholder-images.mjs
 
 `npm run migrate:buses` converts the old Tourzin site's listings (repo `tourbus`) into the new model:
 
-- **Sources:** `scripts/legacy/buses.json` (old base catalog, recovered from git history) **+ live Firestore `buses`** in `tourzin-b6323` (public read) — merged exactly like the old site (edits override, `deleted: true` skipped).
+- **Source:** live Firestore `buses` in `tourzin-b6323` (public read) only; `deleted: true` is skipped, and where a bus has more than one doc the most recently updated wins. The old git-history catalog (`scripts/legacy/buses.json`) is only merged in with `--legacy scripts/legacy/buses.json`.
 - **Output:** `src/lib/data/migrated.json` → used automatically as the operators/vehicles in mock mode.
 - **Mapping:** one operator per name + district; each bus → a vehicle. Type: `TT` → Tempo Traveller, `Urbania` → Urbania, `Coach*` → Tourist Coach, `Mini Bus` → Mini Bus (hidden until launch), other bus types by seats (≤17 TT, ≤26 Mini Bus, ≤35 Coach, else Tourist Bus). `paid` → Premium + Active, otherwise Base + Trial. `verified` kept. `perDayRent` → approx. daily price (lowest per operator). `available:false` → vehicle Paused. Email, location, amenities and old rating go to internal notes (ratings are not shown publicly).
 - **Photos:** the old site had none, so each vehicle gets placeholder illustrations (flagged in internal notes) — replace in Admin → Vehicles.
 - **Write to Firestore:** `npm i -D firebase-admin` then `node scripts/migrate-buses.mjs --write --service-account ./serviceAccount.json`. Writes `operators` + `vehicles` only; the old `buses`/`analytics` collections are untouched. Keep the key file out of git.
-
-Run it on your own computer to include edits made in the old admin (this build only had the git-history catalog).
 
 ## Moving to Firebase
 

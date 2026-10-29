@@ -20,6 +20,7 @@ export interface VehicleCategory {
   blurb: string;
   useCases: string[];
   color: string;
+  photo?: string; // real photo under /public; falls back to the /img/vehicles illustrations
 }
 
 export interface District {

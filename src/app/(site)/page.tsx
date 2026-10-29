@@ -99,7 +99,7 @@ export default function HomePage() {
             const inner = (
               <>
                 <div className="relative aspect-[16/10] overflow-hidden bg-soft">
-                  <img src={`/img/vehicles/${c.id}-1.svg`} alt={`${c.name} illustration`} loading="lazy" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
+                  <img src={c.photo ?? `/img/vehicles/${c.id}-1.svg`} alt={c.photo ? c.name : `${c.name} illustration`} loading="lazy" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
                   {!c.live && <span className="badge absolute left-3 top-3 bg-orange text-white">Coming soon</span>}
                 </div>
                 <div className="flex flex-1 flex-col p-4">
